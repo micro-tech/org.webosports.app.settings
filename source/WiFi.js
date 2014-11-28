@@ -1,4 +1,6 @@
-Array.prototype.contains = function(obj) {
+/* jslint sloppy: true, white: true */
+
+Array.prototype.contains = function (obj) {
     var i = this.length;
     while (i--) {
         if (this[i] === obj) {
@@ -6,12 +8,11 @@ Array.prototype.contains = function(obj) {
         }
     }
     return false;
-}
+};
 
 enyo.kind({
     name: "WiFiListItem",
     classes: "group-item-wrapper",
-    
     components: [
         {
             classes: "group-item",
@@ -20,17 +21,17 @@ enyo.kind({
                 {
                     name: "SSID",
                     content: "SSID",
-                   
-                    style: "padding-top: 10px; max-width: 150px;"
+                    fit: true,
+                    style: "padding-top: 10px; max-width: 150px; overflow: hidden;"
                 },
-                { kind: "enyo.FittableColumns", fit: true, style: "float: right; ", components: [
-              
+                { kind: "enyo.FittableColumns", style: "float: right; ", components: [
+             
 					{	
 						name: "spin",
                     	kind: "onyx.Spinner", 
                     	showing: false,
                     	style: "padding: 30px;",
-                    	classes: "onyx-light",
+                    	classes: "onyx-light"
             		},
             		{
 						name: "StatusMessage",
@@ -39,7 +40,6 @@ enyo.kind({
 						showing: false,
 						style: "padding-top: 10px;"
 					},
-
             		{
                     	name: "Active",
                     	kind: "Image",
@@ -60,9 +60,15 @@ enyo.kind({
                     	src: "assets/wifi/signal-icon.png",
                 		classes: "wifi-list-icon"
                 	}
-                ]},
-            ]},
+                ]}
+            ]}
 	],
+	reflow: function (inSender, inEvent) {
+		this.log("sender:", inSender, ", event:", inEvent);
+		this.inherited(arguments);
+		this.render;
+	},
+	
     handlers: {
         onmousedown: "pressed",
         ondragstart: "released",
@@ -162,7 +168,8 @@ enyo.kind({
                     name: "WiFiToggle",
                     kind: "onyx.ToggleButton",
                     onChange: "toggleButtonChanged",
-                    showing: "true"
+                    showing: "true",
+                    style: "height: 31px;"
                 }
             ]
         },
@@ -201,7 +208,7 @@ enyo.kind({
                             components: [
                                 {
                                     kind: "onyx.GroupboxHeader",
-                                    content: "Choose a Network",
+                                    content: "Choose a Network"
                                 },
                                 {
                                     classes: "networks-scroll",
@@ -225,7 +232,7 @@ enyo.kind({
                                 },
                                 {name: "networkSearch", kind: "enyo.FittableColumns", showing: false, classes: "wifi-join-button", components: [
 									{content: "Searching for networks", fit: true, classes: "networkSearch"},
-									{name: "spin2",	kind: "onyx.Spinner", showing: true, style: "padding: 30px;", classes: "onyx-light" },
+									{name: "spin2",	kind: "onyx.Spinner", showing: true, style: "padding: 30px;", classes: "onyx-light" }
                                 ]},				//network search spinner
                                 {
                                     name: "JoinButton",
@@ -239,7 +246,7 @@ enyo.kind({
                                         {
                                             content: "Join Network",
                                             fit: true
-                                        },
+                                        }
                                         
                                     ],
                                     ontap: "onJoinButtonTapped",
@@ -254,7 +261,7 @@ enyo.kind({
                                     released: function () {
                                         this.removeClass("onyx-selected");
                                     }
-                                },
+                                }
                                
                             ]
 						}]
@@ -401,9 +408,9 @@ enyo.kind({
                                     kind: "onyx.Button",
                                     content: "Cancel",
                                     ontap: "onOtherJoinCancelled"
-                                },
+                                }
                             ]
-                        },
+                        }
                     ]
                 },
                 /* Network configuration panel */
@@ -426,6 +433,7 @@ enyo.kind({
                                         {
                                             kind: "FittableColumns",
                                             classes: "group-item",
+                                            style: "height: 40px; padding-top: 15px;",
                                             components: [
                                                 {
                                                     content: "Automatic IP Setings",
@@ -433,8 +441,9 @@ enyo.kind({
                                                 },
                                                 {
                                                     kind: "onyx.ToggleButton",
-                                                    value: true
-                                                },
+                                                    value: true,
+                                                    style: "height: 31px;"
+                                                }
                                             ]
                                         }
                                     ]
@@ -529,13 +538,13 @@ enyo.kind({
                                     kind: "onyx.Button",
                                     content: "Done",
                                     ontap: "showNetworksList"
-                                },
+                                }
                             ]
-                        },
+                        }
                     ]
                 },
                 
-                { /* Workaround for HFlipArranger incorrectly displaying with 2 panels*/ },
+                { /* Workaround for HFlipArranger incorrectly displaying with 2 panels*/ }
             ]
             
         },
@@ -550,12 +559,13 @@ enyo.kind({
                 }, // this is hacky
                 {
                     fit: true
-                },
+                }
             ]
-        },
+        }
     ],
     //Handlers
     create: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
         this.inherited(arguments);
 
         console.log("WiFi: created");
@@ -571,20 +581,21 @@ enyo.kind({
 
         this.palm = true;
 
-        if (!navigator.WiFiManager)
+        if (!navigator.WiFiManager){
             return;
-
+        }
         navigator.WiFiManager.onenabled = enyo.bind(this, "handleWiFiEnabled");
         navigator.WiFiManager.ondisabled = enyo.bind(this, "handleWiFiDisabled");
         navigator.WiFiManager.onnetworkschange = enyo.bind(this, "handleWiFiNetworksChanged");
 
-        if (navigator.WiFiManager.enabled)
-            handleWiFiEnabled();
-
+        if (navigator.WiFiManager.enabled){
+            this.handleWiFiEnabled();
+        }
         this.doActiveChanged({value: navigator.WiFiManager.enabled});
         this.updateSpinnerState("start");
     },
-    reflow: function (inSender) {
+    reflow: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
         this.inherited(arguments);
         if (enyo.Panels.isScreenNarrow()){
         	this.$.NetworkList.setStyle("padding: 35px 5% 35px 5%;");
@@ -595,7 +606,8 @@ enyo.kind({
     },
     //Action Handlers
     toggleButtonChanged: function (inSender, inEvent) {
-        if (inEvent.value == true){
+    	this.log("sender:", inSender, ", event:", inEvent);
+        if (inEvent.value === true){
             this.activateWiFi(this);
         } else{
             this.deactivateWiFi(this);
@@ -604,10 +616,11 @@ enyo.kind({
         this.doActiveChanged(inEvent);
     },
     listItemTapped: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
         var selectedNetwork = this.foundNetworks[inEvent.index];
 
         // don't try to connect to already connected or connecting network
-        if (selectedNetwork.state != "idle" && selectedNetwork.state != "failure") {
+        if (selectedNetwork.state !== "idle" && selectedNetwork.state !== "failure") {
             this.$.NetworkConfiguration.currentNetwork = {
                 path: selectedNetwork.path
             };
@@ -636,18 +649,23 @@ enyo.kind({
         }
     },
     onJoinButtonTapped: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
 		this.showJoinNetwork();
     },
     signalStrengthToBars: function(strength) {
-        if(strength > 0 && strength < 34)
+        if(strength > 0 && strength < 34){
             return 1;
-        else if(strength >= 34 && strength < 50)
-            return 2;
-        else if(strength >= 50)
-            return 3;
+        }
+        if(strength >= 34 && strength < 50){
+           	return 2;
+        }
+        if(strength >= 50){
+        	return 3;
+        }
         return 0;
     },
     setupSearchRow: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
     	var ssid = "";
     	if(enyo.Panels.isScreenNarrow()){
     		if(this.foundNetworks[inEvent.index].name.length >= 18){					// if the SSID is longer shortten it for the narrow page only
@@ -683,7 +701,7 @@ enyo.kind({
             inEvent.item.$.wiFiListItem.$.StatusMessage.setContent("Association failed!");
             inEvent.item.$.wiFiListItem.$.spin.setShowing(false);
             break;
-        case "idle":
+//        case "idle":
         default:
             inEvent.item.$.wiFiListItem.$.Active.setShowing(false);
             inEvent.item.$.wiFiListItem.$.StatusMessage.setShowing(false);
@@ -702,6 +720,7 @@ enyo.kind({
 		}
     },
     setupKnownNetworkRow: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
     	var ssid = "";	
 		if(enyo.Panels.isScreenNarrow()){
     		if(this.foundNetworks[inEvent.index].name.length >= 18){					// if the SSID is longer shortten it for the narrow page only
@@ -717,6 +736,7 @@ enyo.kind({
         inEvent.item.$.wiFiListItem.$.Signal.setShowing(false);
     },
     onNetworkConnect: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
 		var password = this.$.PasswordInput.getValue();
 		
         if (this.validatePassword(password)) {
@@ -730,17 +750,21 @@ enyo.kind({
 
         // switch back to network list view
         this.showNetworksList();
-		delete password;
+        /* jshint ignore:start */
+		delete password;	 // jshint ignore:line
+		/* jshint ignore:end */
         this.$.PasswordInput.setValue("");
     },
     onNetworkConnectAborted: function (inSender, inEvent) {
         // switch back to network list view
+        this.log("sender:", inSender, ", event:", inEvent);
         this.showNetworksList(inSender, inEvent);
 
         this.$.PasswordInput.setValue("");
     },
     onOtherJoinCancelled: function (inSender, inEvent) {
         // switch back to network list view
+        this.log("sender:", inSender, ", event:", inEvent);
         this.showNetworksList(inSender, inEvent);
 
         this.$.ssidInput.setValue("");
@@ -748,22 +772,27 @@ enyo.kind({
     },
     //Action Functions
     showWiFiDisabled: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
         this.stopAutoscan();
         this.$.WiFiPanels.setIndex(0);
     },
     showNetworksList: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
 		this.updateSpinnerState("start");
         return this.$.WiFiPanels.setIndex(1);
     },
     showNetworkConnect: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
         this.$.WiFiPanels.setIndex(2);
         this.stopAutoscan();
     },
     showJoinNetwork: function(inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
         this.$.WiFiPanels.setIndex(3);
         this.stopAutoscan();
     },
     showNetworkConfiguration: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
         this.$.WiFiPanels.setIndex(4);
         this.stopAutoscan();
     },
@@ -779,26 +808,33 @@ enyo.kind({
 		this.log("sender:", inSender, ", event:", inEvent);
 		this.updateSpinnerState("start");
         this.showNetworksList();
-		if (!navigator.WiFiManager)
+		if (!navigator.WiFiManager){
             return;
+		}
         navigator.WiFiManager.enabled = true;
     },
     deactivateWiFi: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
         this.showWiFiDisabled();
-        if (!navigator.WiFiManager)
+        if (!navigator.WiFiManager){
             return;
+        }
         navigator.WiFiManager.enabled = false;
     },
-    handleNetworkConnectSucceeded: function() {
+    handleNetworkConnectSucceeded: function(inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
+    	
 	},
-    handleNetworkConnectFailed: function() {
+    handleNetworkConnectFailed: function(inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
 	},
     connectNetwork: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);	
         console.log("connectNetwork " + JSON.stringify(inEvent));
 
-        if (!this.palm)
+        if (!this.palm){
             return;
-
+        }
         var networkToConnect = {
             path: inEvent.path,
             hidden: false,
@@ -806,7 +842,7 @@ enyo.kind({
             password: ""
         };
 
-        if (inEvent.password != "") {
+        if (inEvent.password !== "") {
             enyo.log("Connecting to PSK network");
             networkToConnect.security = "psk";
             networkToConnect.password = inEvent.password;
@@ -822,6 +858,7 @@ enyo.kind({
         this.triggerAutoscan();
     },
     forgetNetwork: function(inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
         var network = this.$.NetworkConfiguration.currentNetwork;
 
         navigator.WiFiManager.removeNetwork(network.path);
@@ -831,7 +868,6 @@ enyo.kind({
     updateSpinnerState: function(inSender, inEvent) {
 		this.log("sender:", inSender, ", event:", inEvent);
 		
-		var text = inEvent;
 		if (inSender === "start" ){
 			this.$.networkSearch.show();
 		}else{
@@ -872,15 +908,17 @@ enyo.kind({
 		if (null === this.autoscan) {
             console.log("Starting autoscan ...");
             this.autoscan = window.setInterval(enyo.bind(this, "triggerAutoscan"), 15000);
-            if (!this.foundNetworks)
+            if (!this.foundNetworks){
                 this.triggerAutoscan();
                 console.log("this.triggerAutoscan();");
+            }
         }
     },
     triggerAutoscan: function() {
 		this.updateSpinnerState("start");
-		if (!navigator.WiFiManager)
+		if (!navigator.WiFiManager){
             return;
+		}
         navigator.WiFiManager.retrieveNetworks(enyo.bind(this, "handleRetrieveNetworksResponse"),
                                                enyo.bind(this, "handleRetrieveNetworksFailed"));
     },
@@ -905,7 +943,9 @@ enyo.kind({
         this.clearFoundNetworks();
     },
     handleConnectResponse: function (inSender, inResponse) {
-        var result = inResponse.data;
+    	this.log("sender:", inSender, ",inResponse:", inResponse);
+    	
+    //    var result = inResponse.data;
    
         this.showError("Connection could not be established");
     },
@@ -922,6 +962,6 @@ enyo.kind({
     handleWiFiNetworksChanged: function(networks) {
         this.handleRetrieveNetworksResponse(networks);
         this.stopAutoscan();
-    },
+    }
     
 });
