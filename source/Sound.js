@@ -1,4 +1,4 @@
-
+/*jslint node: true, sloppy: true, todo: true, white: true */
 enyo.kind({
 	name: "Sound",
 	kind: "enyo.FittableRows",
@@ -17,7 +17,7 @@ enyo.kind({
 	debug: false,
 	components: [
 		{kind: "onyx.Toolbar", layoutKind: "FittableColumnsLayout", classes: "onyx-toolbar", style: "line-height: 28px;", components: [
-			{content: "Audio"},
+			{content: "Audio"}
 		]},
 		{kind: "Scroller", touch: true,	horizontal: "hidden", fit: true, components:[
 			{name: "div", tag: "div", style: "padding: 35px 10% 35px 10%;", fit: true, components: [
@@ -60,22 +60,22 @@ enyo.kind({
 							]}
 						]},
 						{ kind: "enyo.FittableColumns", classes: "group-item", style: "padding: 0px;", components: [
-							{name: "ringerPicker", kind: "onyx.Button", fit: true,  content: "Ring tone Picker ", ontap: "ringerPopup"},
-						]},
+							{name: "ringerPicker", kind: "onyx.Button", fit: true,  content: "Ring tone Picker ", ontap: "ringerPopup"}
+						]}
 					]}
 				]}
-			]},
+			]}
 		]},
 		{kind: "onyx.Toolbar", layoutKind: "FittableColumnsLayout", components: [
             {name: "Grabber", kind: "onyx.Grabber" }, // this is hacky
-            {fit: true },
+            {fit: true }
         ]},
 		{name: "ErrorPopup", kind: "onyx.Popup", classes: "error-popup", modal: true, style: "padding: 10px;", components: [
 			{name: "ErrorMessage", content: "", style: "display: inline;"}
 		]},
 		{name: "ringPickerPopup", kind: "onyx.Popup", classes: "popup", centered: true, floating: true,	components: [
-			{kind: "pickRingTones", style: "height: 100%; width: 100%;"},
-		]},		// tone popup
+			{kind: "pickRingTones", style: "height: 100%; width: 100%;"}
+		]}		// tone popup
 	],
 	//Handlers
 	create: function() {
@@ -95,7 +95,8 @@ enyo.kind({
         this.manage();
       //  this.$.p.setShowing(0);
     },
-    reflow: function (inSender) {
+    reflow: function (inSender, inEvent) {
+    	this.log("sender:", inSender, ", event:", inEvent);
         this.inherited(arguments);
         if (enyo.Panels.isScreenNarrow()){
             this.$.Grabber.applyStyle("visibility", "hidden");
@@ -139,6 +140,7 @@ enyo.kind({
 		this.$.ringPickerPopup.setShowing(true);
 	},
 	closePopup: function(inSender, inEvent){
+		this.log("sender:", inSender, ", event:", inEvent);
 		this.$.ringPickerPopup.hide();
 	},
 	tonepicked: function(inSender, inEvent){
@@ -194,5 +196,5 @@ enyo.kind({
 		// TO DO - Auto-generated code
 		console.log("ringer volume value ", inEvent.value);
 		this.ringerVolume = inEvent.value;
-	},		// set ringer volume here
+	}		// set ringer volume here
 });
